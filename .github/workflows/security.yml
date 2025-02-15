@@ -1,0 +1,25 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Security vulnerabilities scan
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        command: monitor
+        
+    - name: Run Bandit
+      run: |
+        pip install bandit
+        bandit -r . -ll -ii -x ./tests
